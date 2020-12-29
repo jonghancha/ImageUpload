@@ -1,7 +1,9 @@
 package com.androidlec.imageupload;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.os.Bundle;
 
 import android.app.Activity;
@@ -39,6 +41,8 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    final  static String TAG = "MainActivity";
+
     ImageView imageView = null;
     Button button = null;
     private final int REQ_CODE_SELECT_IMAGE = 100;
@@ -54,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MODE_PRIVATE); //사용자에게 사진 사용 권한 받기 (가장중요함)
 
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                 .permitDiskReads()
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 // 네트워크 연결 (Thread = asynctask)
                 new Thread(new Runnable() {
                     @Override
@@ -151,14 +158,15 @@ public class MainActivity extends AppCompatActivity {
     //서버 보내기
     private void DoActualRequest(File file) {
         OkHttpClient client = new OkHttpClient();
+        Log.v(TAG,"Called actual request");
         String url = "http://192.168.0.54:8080/test/multipartRequest.jsp";
 
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("image", file.getName(),
                         RequestBody.create(MediaType.parse("image/jpeg"), file))
-
                 .build();
+        Log.v(TAG,"Request body generated");
 
         Request request = new Request.Builder()
                 .url(url)
@@ -167,9 +175,10 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             Response response = client.newCall(request).execute();
-
+            Log.v(TAG,"Request successful");
+            Log.v(TAG,response.body().string());
         } catch (IOException e) {
-
+            Log.v(TAG,"Exception occured :" + e.toString());
             e.printStackTrace();
         }
     }
