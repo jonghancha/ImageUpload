@@ -23,11 +23,14 @@ import android.widget.Toast;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 import android.widget.ImageView;
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap image_bitmap_copy = null;
     private Bitmap image_bitmap = null;
     private String imageName = null;
+    private String f_ext = null;
+    File tempSelectFile;
 
 
 
@@ -118,6 +123,15 @@ public class MainActivity extends AppCompatActivity {
                     ImageView image = findViewById(R.id.iv);  //이미지를 띄울 위젯 ID값
                     image.setImageBitmap(image_bitmap_copy);
 
+                    // 파일 이름 및 경로 바꾸기(임시 저장)
+                    String date = new SimpleDateFormat("yyyyMMddHmsS").format(new Date());
+                    imageName = date+"."+f_ext;
+                    tempSelectFile = new File("/data/data/com.androidlec.imageupload/", imageName);
+                    OutputStream out = new FileOutputStream(tempSelectFile);
+                    image_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+                    // 임시 파일 경로로 위의 img_path 재정의
+                    img_path = "/data/data/com.androidlec.imageupload/"+imageName;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -139,6 +153,9 @@ public class MainActivity extends AppCompatActivity {
 
         //이미지의 이름 값
         String imgName = imgPath.substring(imgPath.lastIndexOf("/") + 1);
+
+        // 확장자 명 저장
+        f_ext = imgPath.substring(imgPath.length()-3, imgPath.length());
         Toast.makeText(MainActivity.this, "이미지 이름 : " + imgName, Toast.LENGTH_SHORT).show();
         this.imageName = imgName;
 
