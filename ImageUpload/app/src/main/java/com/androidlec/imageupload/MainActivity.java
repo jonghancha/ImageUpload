@@ -114,23 +114,19 @@ public class MainActivity extends AppCompatActivity {
                     //이미지를 비트맵형식으로 반환
                     image_bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
 
-                    //사용자 단말기의 width , height 값 반환
-                    int reWidth = (int) (getWindowManager().getDefaultDisplay().getWidth());
-                    int reHeight = (int) (getWindowManager().getDefaultDisplay().getHeight());
-
                     //image_bitmap 으로 받아온 이미지의 사이즈를 임의적으로 조절함. width: 400 , height: 300
                     image_bitmap_copy = Bitmap.createScaledBitmap(image_bitmap, 400, 300, true);
                     ImageView image = findViewById(R.id.iv);  //이미지를 띄울 위젯 ID값
                     image.setImageBitmap(image_bitmap_copy);
 
-                    // 파일 이름 및 경로 바꾸기(임시 저장)
+                    // 파일 이름 및 경로 바꾸기(임시 저장, 경로는 임의로 지정 가능)(20.12.30)
                     String date = new SimpleDateFormat("yyyyMMddHmsS").format(new Date());
                     imageName = date+"."+f_ext;
                     tempSelectFile = new File("/data/data/com.androidlec.imageupload/", imageName);
                     OutputStream out = new FileOutputStream(tempSelectFile);
                     image_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
 
-                    // 임시 파일 경로로 위의 img_path 재정의
+                    // 임시 파일 경로로 위의 img_path 재정의(20.12.30)
                     img_path = "/data/data/com.androidlec.imageupload/"+imageName;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -154,10 +150,8 @@ public class MainActivity extends AppCompatActivity {
         //이미지의 이름 값
         String imgName = imgPath.substring(imgPath.lastIndexOf("/") + 1);
 
-        // 확장자 명 저장
+        // 확장자 명 저장(20.12.30)
         f_ext = imgPath.substring(imgPath.length()-3, imgPath.length());
-        Toast.makeText(MainActivity.this, "이미지 이름 : " + imgName, Toast.LENGTH_SHORT).show();
-        this.imageName = imgName;
 
         return imgPath;
     }//end of getImagePathToUri()
@@ -176,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
     private void DoActualRequest(File file) {
         OkHttpClient client = new OkHttpClient();
         Log.v(TAG,"Called actual request");
-        String url = "http://192.168.0.54:8080/test/multipartRequest.jsp";
+        String url = "http://192.168.0.79:8080/test/multipartRequest.jsp";
 
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
